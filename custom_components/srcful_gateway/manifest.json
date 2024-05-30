@@ -1,10 +1,10 @@
 {
   "domain": "srcful_gateway",
-  "name": "Srcful Gateway",
-  "version": "1.0.0",
+  "name": "Srcful monitor",
+  "version": "1.0.1",
   "config_flow": true,
-  "documentation": "https://www.example.com",
+  "documentation": "https://github.com/erikarenhill/srcful-gateway-home-assistant",
   "requirements": [],
-  "codeowners": ["@yourusername"],
+  "codeowners": ["@erikarenhill"],
   "iot_class": "local_polling"
 }

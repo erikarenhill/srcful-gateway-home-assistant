@@ -12,14 +12,16 @@ async def async_setup_entry(hass, entry, async_add_entities):
     unique_id = entry.entry_id
 
     async_add_entities([
-        InverterNameSensor(coordinator, name, unique_id),
-        InverterUptimeSensor(coordinator, name, unique_id),
+        GatewayNameSensor(coordinator, name, unique_id),
+        GatewayUptimeSensor(coordinator, name, unique_id),
         InverterConnectionSensor(coordinator, name, unique_id),
         InverterHostSensor(coordinator, name, unique_id),
         InverterPortSensor(coordinator, name, unique_id),
         InverterStatusSensor(coordinator, name, unique_id),
         InverterTypeSensor(coordinator, name, unique_id),
-        InverterVersionSensor(coordinator, name, unique_id),
+        GatewayFirmwareVersionSensor(coordinator, name, unique_id),
+        CryptoDeviceNameSensor(coordinator, name, unique_id),
+        CryptoSerialSensor(coordinator, name, unique_id)
     ], update_before_add=True)
 
 class InverterSensor(CoordinatorEntity, SensorEntity):
@@ -53,7 +55,7 @@ class InverterSensor(CoordinatorEntity, SensorEntity):
             sw_version=self.coordinator.data["version"].get("version"),
         )
 
-class InverterNameSensor(InverterSensor):
+class GatewayNameSensor(InverterSensor):
     def __init__(self, coordinator, name, unique_id):
         super().__init__(coordinator, name, unique_id, "Name", "name")
 
@@ -61,7 +63,7 @@ class InverterNameSensor(InverterSensor):
     def state(self):
         return self.coordinator.data["name"]
 
-class InverterUptimeSensor(InverterSensor):
+class GatewayUptimeSensor(InverterSensor):
     def __init__(self, coordinator, name, unique_id):
         super().__init__(coordinator, name, unique_id, "Uptime", "uptime", "s")
 
@@ -111,10 +113,26 @@ class InverterTypeSensor(InverterSensor):
     def state(self):
         return self.coordinator.data["inverter"].get("type", "unknown")
 
-class InverterVersionSensor(InverterSensor):
+class GatewayFirmwareVersionSensor(InverterSensor):
     def __init__(self, coordinator, name, unique_id):
         super().__init__(coordinator, name, unique_id, "Version", "version")
 
     @property
     def state(self):
         return self.coordinator.data["version"].get("version", "unknown")
+
+class CryptoDeviceNameSensor(InverterSensor):
+    def __init__(self, coordinator, name, unique_id):
+        super().__init__(coordinator, name, unique_id, "Device name", "crypto")
+
+    @property
+    def state(self):
+        return self.coordinator.data["crypto"].get("deviceName", "unknown")
+
+class CryptoSerialSensor(InverterSensor):
+    def __init__(self, coordinator, name, unique_id):
+        super().__init__(coordinator, name, unique_id, "Serial number", "crypto")
+
+    @property
+    def state(self):
+        return self.coordinator.data["crypto"].get("serialNumber", "unknown")
