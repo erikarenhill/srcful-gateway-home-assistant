@@ -4,6 +4,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from .const import DOMAIN, CONF_IP_ADDRESS, DEFAULT_SCAN_INTERVAL
+from .graphql_client import GraphQLClientWrapper
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -11,6 +12,9 @@ PLATFORMS = ["sensor"]
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     ip_address = entry.data[CONF_IP_ADDRESS]
+    graphql_endpoint = f"https://api.srcful.dev/"
+    #client = GraphQLClientWrapper(graphql_endpoint)
+    #todo: fetch data from energy-api
 
     async def async_fetch_data():
         try:
