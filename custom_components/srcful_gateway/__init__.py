@@ -4,7 +4,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from .const import DOMAIN, CONF_IP_ADDRESS, DEFAULT_SCAN_INTERVAL
-from .graphql_client import GraphQLClientWrapper
+#from .graphql_client import GraphQLClientWrapper
 
 _LOGGER = logging.getLogger(__name__)
 
