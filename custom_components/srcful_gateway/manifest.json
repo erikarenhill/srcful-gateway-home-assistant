@@ -1,0 +1,10 @@
+{
+  "domain": "srcful_gateway",
+  "name": "Srcful Gateway",
+  "version": "1.0.0",
+  "config_flow": true,
+  "documentation": "https://www.example.com",
+  "requirements": [],
+  "codeowners": ["@yourusername"],
+  "iot_class": "local_polling"
+}

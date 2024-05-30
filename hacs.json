@@ -1,0 +1,6 @@
+{
+	"name": "Srcful gateway monitor",
+	"country": "SE",
+	"render_readme": false,
+	"domains": ["sensor"]
+}
