@@ -142,7 +142,8 @@ class CryptoSerialSensor(InverterSensor):
 
 class ProofOfSourceLatestWhenSensor(InverterSensor):
     def __init__(self, coordinator, name, unique_id):
-        super().__init__(coordinator, name, unique_id, "Latest timestamp", "latest.when")
+        super().__init__(coordinator, name, unique_id, "Last seen", "latest.when")
+        self._attr_device_class = SensorDeviceClass.TIMESTAMP
 
     @property
     def state(self):
