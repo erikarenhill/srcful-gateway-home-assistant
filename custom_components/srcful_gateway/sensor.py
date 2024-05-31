@@ -68,7 +68,7 @@ class GatewayNameSensor(InverterSensor):
 
 class GatewayUptimeSensor(InverterSensor):
     def __init__(self, coordinator, name, unique_id):
-        super().__init__(coordinator, name, unique_id, "Uptime (s)", "uptime", "s")
+        super().__init__(coordinator, name, unique_id, "Uptime", "uptime", "s")
 
     @property
     def state(self):
@@ -150,7 +150,7 @@ class ProofOfSourceLatestWhenSensor(InverterSensor):
 
 class ProofOfSourceLatestPowerSensor(InverterSensor):
     def __init__(self, coordinator, name, unique_id):
-        super().__init__(coordinator, name, unique_id, "Latest Power (W)", "latest.power", "W")
+        super().__init__(coordinator, name, unique_id, "Latest Power", "latest.power", "W")
         self._attr_device_class = SensorDeviceClass.POWER
 
     @property
@@ -159,7 +159,7 @@ class ProofOfSourceLatestPowerSensor(InverterSensor):
 
 class ProofOfSourceDailykWhSensor(InverterSensor):
     def __init__(self, coordinator, name, unique_id):
-        super().__init__(coordinator, name, unique_id, "Energy produced today (kWh)", "today", "kWh")
+        super().__init__(coordinator, name, unique_id, "Energy produced today", "today", "kWh")
         self._attr_device_class = SensorDeviceClass.ENERGY
 
     @property
