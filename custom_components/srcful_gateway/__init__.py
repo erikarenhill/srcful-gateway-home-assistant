@@ -3,8 +3,8 @@ from datetime import timedelta
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
-from .const import DOMAIN, CONF_IP_ADDRESS, DEFAULT_SCAN_INTERVAL
-#from .graphql_client import GraphQLClientWrapper
+from .const import DOMAIN, CONF_IP_ADDRESS, DEFAULT_SCAN_INTERVAL, SRCFUL_API
+from .graphql_client import GraphQLClientWrapper
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -12,9 +12,8 @@ PLATFORMS = ["sensor"]
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     ip_address = entry.data[CONF_IP_ADDRESS]
-    graphql_endpoint = f"https://api.srcful.dev/"
-    #client = GraphQLClientWrapper(graphql_endpoint)
-    #todo: fetch data from energy-api
+    graphql_endpoint = SRCFUL_API
+    client = GraphQLClientWrapper(graphql_endpoint)
 
     async def async_fetch_data():
         try:
@@ -29,13 +28,31 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                     version_data = await response.json()
                 async with session.get(f"http://{ip_address}/api/crypto") as response:
                     crypto_data = await response.json()
+                    serial_number = crypto_data.get("serialNumber")
+
+                query = f"""
+                {{
+                  proofOfSource(id: "{serial_number}") {{
+                    latest {{
+                      when
+                      power
+                    }}
+                    today(tz: "Europe/Stockholm")
+                  }}
+                }}
+                """
+                _LOGGER.debug(query)
+                response = await client.fetch_data(query)
+                proof_of_source_data = response.get('data', {}).get('proofOfSource', {})
+                
 
             return {
                 "name": name_data.get("name"),
                 "uptime": uptime_data,
                 "inverter": inverter_data,
                 "version": version_data,
-                "crypto": crypto_data
+                "crypto": crypto_data,
+                "proofOfSource": proof_of_source_data
             }
         except Exception as e:
             raise UpdateFailed(f"Error fetching data: {e}")

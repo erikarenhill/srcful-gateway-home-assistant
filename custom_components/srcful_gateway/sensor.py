@@ -1,5 +1,5 @@
 import logging
-from homeassistant.components.sensor import SensorEntity
+from homeassistant.components.sensor import SensorEntity, SensorDeviceClass
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.helpers.entity import DeviceInfo
 from .const import DOMAIN
@@ -21,7 +21,10 @@ async def async_setup_entry(hass, entry, async_add_entities):
         InverterTypeSensor(coordinator, name, unique_id),
         GatewayFirmwareVersionSensor(coordinator, name, unique_id),
         CryptoDeviceNameSensor(coordinator, name, unique_id),
-        CryptoSerialSensor(coordinator, name, unique_id)
+        CryptoSerialSensor(coordinator, name, unique_id),
+        ProofOfSourceLatestWhenSensor(coordinator, name, unique_id),
+        ProofOfSourceLatestPowerSensor(coordinator, name, unique_id),
+        ProofOfSourceDailykWhSensor(coordinator, name, unique_id),
     ], update_before_add=True)
 
 class InverterSensor(CoordinatorEntity, SensorEntity):
@@ -65,7 +68,7 @@ class GatewayNameSensor(InverterSensor):
 
 class GatewayUptimeSensor(InverterSensor):
     def __init__(self, coordinator, name, unique_id):
-        super().__init__(coordinator, name, unique_id, "Uptime", "uptime", "s")
+        super().__init__(coordinator, name, unique_id, "Uptime (s)", "uptime", "s")
 
     @property
     def state(self):
@@ -136,3 +139,29 @@ class CryptoSerialSensor(InverterSensor):
     @property
     def state(self):
         return self.coordinator.data["crypto"].get("serialNumber", "unknown")
+
+class ProofOfSourceLatestWhenSensor(InverterSensor):
+    def __init__(self, coordinator, name, unique_id):
+        super().__init__(coordinator, name, unique_id, "Latest timestamp", "latest.when")
+
+    @property
+    def state(self):
+        return self.coordinator.data["proofOfSource"].get("latest", {}).get("when", "unknown")
+
+class ProofOfSourceLatestPowerSensor(InverterSensor):
+    def __init__(self, coordinator, name, unique_id):
+        super().__init__(coordinator, name, unique_id, "Latest Power (W)", "latest.power", "W")
+        self._attr_device_class = SensorDeviceClass.POWER
+
+    @property
+    def state(self):
+        return self.coordinator.data["proofOfSource"].get("latest", {}).get("power", "unknown")
+
+class ProofOfSourceDailykWhSensor(InverterSensor):
+    def __init__(self, coordinator, name, unique_id):
+        super().__init__(coordinator, name, unique_id, "Energy produced today (kWh)", "today", "kWh")
+        self._attr_device_class = SensorDeviceClass.ENERGY
+
+    @property
+    def state(self):
+        return self.coordinator.data["proofOfSource"].get("today", 0)
