@@ -39,11 +39,20 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                     }}
                     today(tz: "Europe/Stockholm")
                   }}
+                  gateway {{
+                    total
+                  }}
+                  stats {{
+                    gatewaysOnline
+                    currentKW
+                  }}
                 }}
                 """
                 _LOGGER.debug(query)
                 response = await client.fetch_data(query)
                 proof_of_source_data = response.get('data', {}).get('proofOfSource', {})
+                gateway_data = response.get('data', {}).get('gateway', {})
+                stats_data = response.get('data', {}).get('stats', {})
                 
 
             return {
@@ -52,7 +61,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                 "inverter": inverter_data,
                 "version": version_data,
                 "crypto": crypto_data,
-                "proofOfSource": proof_of_source_data
+                "proofOfSource": proof_of_source_data,
+                "stats": stats_data,
+                "gateway": gateway_data
             }
         except Exception as e:
             raise UpdateFailed(f"Error fetching data: {e}")

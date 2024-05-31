@@ -25,6 +25,8 @@ async def async_setup_entry(hass, entry, async_add_entities):
         ProofOfSourceLatestWhenSensor(coordinator, name, unique_id),
         ProofOfSourceLatestPowerSensor(coordinator, name, unique_id),
         ProofOfSourceDailykWhSensor(coordinator, name, unique_id),
+        CurrentGatewaysOnlineSensor(coordinator, name, unique_id),
+        CurrentTotalKwSensor(coordinator, name, unique_id),
     ], update_before_add=True)
 
 class InverterSensor(CoordinatorEntity, SensorEntity):
@@ -166,3 +168,21 @@ class ProofOfSourceDailykWhSensor(InverterSensor):
     @property
     def state(self):
         return self.coordinator.data["proofOfSource"].get("today", 0)
+
+
+class CurrentGatewaysOnlineSensor(InverterSensor):
+    def __init__(self, coordinator, name, unique_id):
+        super().__init__(coordinator, name, unique_id, "Gateways online", "stats")
+
+    @property
+    def state(self):
+        return self.coordinator.data["stats"].get("gatewaysOnline", 0)
+
+class CurrentTotalKwSensor(InverterSensor):
+    def __init__(self, coordinator, name, unique_id):
+        super().__init__(coordinator, name, unique_id, "Total current power", "stats", "kW")
+        self._attr_device_class = SensorDeviceClass.POWER
+
+    @property
+    def state(self):
+        return self.coordinator.data["stats"].get("currentKW", 0)

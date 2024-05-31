@@ -1,7 +1,7 @@
 {
   "domain": "srcful_gateway",
   "name": "Srcful monitor",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "config_flow": true,
   "documentation": "https://github.com/erikarenhill/srcful-gateway-home-assistant",
   "requirements": [
