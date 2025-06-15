@@ -3,6 +3,7 @@ from datetime import timedelta
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from .const import DOMAIN, CONF_IP_ADDRESS, DEFAULT_SCAN_INTERVAL, SRCFUL_API
 from .graphql_client import GraphQLClientWrapper
 
@@ -17,42 +18,42 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
     async def async_fetch_data():
         try:
-            async with hass.helpers.aiohttp_client.async_get_clientsession() as session:
-                async with session.get(f"http://{ip_address}/api/name") as response:
-                    name_data = await response.json()
-                async with session.get(f"http://{ip_address}/api/uptime") as response:
-                    uptime_data = await response.json()
-                async with session.get(f"http://{ip_address}/api/inverter") as response:
-                    inverter_data = await response.json()
-                async with session.get(f"http://{ip_address}/api/version") as response:
-                    version_data = await response.json()
-                async with session.get(f"http://{ip_address}/api/crypto") as response:
-                    crypto_data = await response.json()
-                    serial_number = crypto_data.get("serialNumber")
+            session = async_get_clientsession(hass)
+            async with session.get(f"http://{ip_address}/api/name") as response:
+                name_data = await response.json()
+            async with session.get(f"http://{ip_address}/api/uptime") as response:
+                uptime_data = await response.json()
+            async with session.get(f"http://{ip_address}/api/inverter") as response:
+                inverter_data = await response.json()
+            async with session.get(f"http://{ip_address}/api/version") as response:
+                version_data = await response.json()
+            async with session.get(f"http://{ip_address}/api/crypto") as response:
+                crypto_data = await response.json()
+                serial_number = crypto_data.get("serialNumber")
 
-                query = f"""
-                {{
-                  proofOfSource(id: "{serial_number}") {{
-                    latest {{
-                      when
-                      power
-                    }}
-                    today(tz: "Europe/Stockholm")
-                  }}
-                  gateway {{
-                    total
-                  }}
-                  stats {{
-                    gatewaysOnline
-                    currentKW
-                  }}
+            query = f"""
+            {{
+                proofOfSource(id: "{serial_number}") {{
+                latest {{
+                    when
+                    power
                 }}
-                """
-                _LOGGER.debug(query)
-                response = await client.fetch_data(query)
-                proof_of_source_data = response.get('data', {}).get('proofOfSource', {})
-                gateway_data = response.get('data', {}).get('gateway', {})
-                stats_data = response.get('data', {}).get('stats', {})
+                today(tz: "Europe/Stockholm")
+                }}
+                gateway {{
+                total
+                }}
+                stats {{
+                gatewaysOnline
+                currentKW
+                }}
+            }}
+            """
+            _LOGGER.debug(query)
+            response = await client.fetch_data(query)
+            proof_of_source_data = response.get('data', {}).get('proofOfSource', {})
+            gateway_data = response.get('data', {}).get('gateway', {})
+            stats_data = response.get('data', {}).get('stats', {})
                 
 
             return {
@@ -81,8 +82,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN][entry.entry_id] = coordinator
 
-    for component in PLATFORMS:
-        hass.async_add_job(hass.config_entries.async_forward_entry_setup(entry, component))
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     return True
 
