@@ -1,5 +1,5 @@
 import logging
-from homeassistant.components.sensor import SensorEntity, SensorDeviceClass
+from homeassistant.components.sensor import SensorEntity, SensorDeviceClass, SensorStateClass
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.helpers.entity import DeviceInfo
 from .const import DOMAIN
@@ -164,6 +164,7 @@ class ProofOfSourceDailykWhSensor(InverterSensor):
     def __init__(self, coordinator, name, unique_id):
         super().__init__(coordinator, name, unique_id, "Energy produced today", "today", "kWh")
         self._attr_device_class = SensorDeviceClass.ENERGY
+        self._attr_state_class = SensorStateClass.TOTAL_INCREASING
 
     @property
     def state(self):
